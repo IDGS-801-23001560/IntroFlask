@@ -1,0 +1,6 @@
+{% macro datos(name, placeholder, type='text') %}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ name }}</label>
+  <input type="{{ type }}" class="{{ name }}" id="{{ name }}" name="n1" placeholder="{{ placeholder }}">
+</div>
+{% endmacro %}

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<form action="/operasbas" method="post">
+  <div class="mb-3">
+    <label for="n1" class="form-label">Numero 1</label>
+    <input type="number" class="form-control" id="n1" name="n1">
+  </div>
+  <div class="mb-3">
+    <label for="n2" class="form-label">Numero 2</label>
+    <input type="number" class="form-control" id="n2" name="n2">
+  </div>
+  <div class="mb-3">
+    <button class="btn btn-primary" value="Calcular">Calcular</button>
+  </div>
+</form>
+<h1>La suma de {{n1}} + {{n2}} = {{res}}</h1>
+{%endblock%}
