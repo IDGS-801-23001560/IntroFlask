@@ -33,6 +33,16 @@
                        href="">Alumnos</a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'cinepolis' %}active{% endif %}"
+                       href="{{ url_for('cinepolis') }}">Cinépolis</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'distancia' %}active{% endif %}"
+                       href="{{ url_for('distancia') }}">Distancia</a>
+                </li>
+
             </ul>
         </div>
     </div>

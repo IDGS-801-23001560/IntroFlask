@@ -1,0 +1,200 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    .cinepolis-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 40px;
+        border-radius: 10px;
+        color: white;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+    .cinepolis-header {
+        text-align: center;
+        margin-bottom: 30px;
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 8px;
+    }
+    .cinepolis-header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: bold;
+    }
+    .cinepolis-header p {
+        font-size: 1.2rem;
+        margin: 5px 0 0 0;
+        letter-spacing: 2px;
+    }
+    .section-box {
+        background: rgba(255,255,255,0.15);
+        border: 2px solid rgba(255,255,255,0.3);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .section-title {
+        font-size: 1.3rem;
+        font-style: italic;
+        margin-bottom: 15px;
+        border-bottom: 2px solid rgba(255,255,255,0.5);
+        padding-bottom: 8px;
+    }
+    .form-label {
+        color: white;
+        font-weight: 500;
+    }
+    .form-control {
+        background: rgba(255,255,255,0.9);
+        border: none;
+    }
+    .radio-group {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+    .actions-box {
+        text-align: center;
+    }
+    .btn-procesar {
+        background: rgba(255,255,255,0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 10px 40px;
+        font-size: 1.1rem;
+        margin: 0 10px;
+    }
+    .btn-procesar:hover {
+        background: rgba(255,255,255,0.3);
+        color: white;
+    }
+    .logo {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .logo-text {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #FFD700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .alert-error {
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .salida-value {
+        background: rgba(255,255,255,0.9);
+        padding: 12px;
+        border-radius: 5px;
+        color: #333;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+    }
+</style>
+
+<div class="cinepolis-container">
+    <div class="cinepolis-header">
+        <h1>Cinépolis</h1>
+        <p>LA CAPITAL DEL CINE</p>
+    </div>
+
+    {% if mensaje_error %}
+    <div class="alert-error">
+        {{ mensaje_error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/cinepolis">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="row">
+            <!-- Sección de Entradas -->
+            <div class="col-md-6">
+                <div class="section-box">
+                    <div class="section-title">Entradas</div>
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               value="{{ nombre }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cantidad_compradores" class="form-label">Cantidad Compradores</label>
+                        <input type="number" class="form-control" id="cantidad_compradores" 
+                               name="cantidad_compradores" min="1" 
+                               value="{{ cantidad_compradores if cantidad_compradores > 0 else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tarjeta Cineco</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="tarjeta_cineco" value="si" 
+                                       {% if tiene_tarjeta %}checked{% endif %} required> Sí
+                            </label>
+                            <label>
+                                <input type="radio" name="tarjeta_cineco" value="no" 
+                                       {% if not tiene_tarjeta and cantidad_boletas > 0 %}checked{% endif %}
+                                       {% if cantidad_boletas == 0 %}checked{% endif %}> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cantidad_boletas" class="form-label">Cantidad De Boletas</label>
+                        <input type="number" class="form-control" id="cantidad_boletas" 
+                               name="cantidad_boletas" min="1" 
+                               value="{{ cantidad_boletas if cantidad_boletas > 0 else '' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Salidas -->
+            <div class="col-md-6">
+                <div class="section-box">
+                    <div class="section-title">Salidas</div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Número de Personas</label>
+                        <div class="salida-value">
+                            {{ cantidad_compradores if cantidad_compradores > 0 else '0' }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Valor a Pagar</label>
+                        <div class="salida-value">
+                            ${{ "{:,.0f}".format(valor_pagar) if valor_pagar > 0 else '0' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-text">✦ cinépolis</div>
+            <p style="margin: 0; font-size: 1.2rem; letter-spacing: 3px;">LA CAPITAL DEL CINE</p>
+        </div>
+
+        <!-- Acciones -->
+        <div class="section-box actions-box" style="margin-top: 20px;">
+            <div class="section-title">Acciones</div>
+            <button type="submit" class="btn btn-procesar">Procesar</button>
+            <button type="button" class="btn btn-procesar" onclick="location.href='/cinepolis'">Salir</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -94,6 +94,77 @@ def operas():
     </form>
     '''
 
+@app.route("/distancia", methods=["GET", "POST"])
+def distancia():
+    import math
+    
+    x1 = ''
+    y1 = ''
+    x2 = ''
+    y2 = ''
+    distancia_result = 0
+    
+    if request.method == 'POST':
+        x1 = float(request.form.get('x1', 0))
+        y1 = float(request.form.get('y1', 0))
+        x2 = float(request.form.get('x2', 0))
+        y2 = float(request.form.get('y2', 0))
+        
+        # Calcular la distancia usando la fórmula: d = √((x2-x1)² + (y2-y1)²)
+        distancia_result = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    
+    return render_template("distancia.html", 
+                          x1=x1, y1=y1, x2=x2, y2=y2, 
+                          distancia=distancia_result)
+
+@app.route("/cinepolis", methods=["GET", "POST"])
+def cinepolis():
+    nombre = ''
+    cantidad_compradores = 0
+    tiene_tarjeta = False
+    cantidad_boletas = 0
+    valor_pagar = 0
+    mensaje_error = ''
+    
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '')
+        cantidad_compradores = int(request.form.get('cantidad_compradores', 0))
+        tiene_tarjeta = request.form.get('tarjeta_cineco') == 'si'
+        cantidad_boletas = int(request.form.get('cantidad_boletas', 0))
+        
+        # Validación: máximo 7 boletas por persona
+        max_boletas = cantidad_compradores * 7
+        
+        if cantidad_boletas > max_boletas:
+            mensaje_error = f'No se pueden comprar más de {max_boletas} boletas ({cantidad_compradores} persona(s) x 7 boletas)'
+        else:
+            # Precio base por boleta
+            precio_boleta = 12000
+            subtotal = cantidad_boletas * precio_boleta
+            
+            # Aplicar descuento por cantidad de boletas
+            descuento_cantidad = 0
+            if cantidad_boletas > 5:
+                descuento_cantidad = 0.15  # 15%
+            elif cantidad_boletas >= 3:
+                descuento_cantidad = 0.10  # 10%
+            
+            total_con_descuento = subtotal * (1 - descuento_cantidad)
+            
+            # Aplicar descuento adicional por tarjeta CINECO
+            if tiene_tarjeta:
+                total_con_descuento = total_con_descuento * 0.90  # 10% adicional
+            
+            valor_pagar = total_con_descuento
+    
+    return render_template("cinepolis.html", 
+                          nombre=nombre,
+                          cantidad_compradores=cantidad_compradores,
+                          tiene_tarjeta=tiene_tarjeta,
+                          cantidad_boletas=cantidad_boletas,
+                          valor_pagar=valor_pagar,
+                          mensaje_error=mensaje_error)
+
 if __name__ == "__main__":
     csrf.init_app(app)
     app.run(debug=True)
